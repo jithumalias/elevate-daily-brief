@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Goose Elevate — Daily Command Brief</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:    #0D1F3C;
+    --navy2:   #0a1628;
+    --teal:    #0A7EA4;
+    --teal2:   #05c4f5;
+    --orange:  #E8820C;
+    --orange2: #ffaa44;
+    --white:   #F4F8FA;
+    --dim:     #7B9AB2;
+    --card:    #111d2e;
+    --border:  #1e3050;
+    --green:   #22c55e;
+    --red:     #ef4444;
+    --amber:   #f59e0b;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--navy2);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Grid background ─────────────────────────────── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(10,126,164,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(10,126,164,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── TOP BAR ─────────────────────────────────────── */
+  .topbar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10, 22, 40, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 58px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .brand-icon {
+    width: 34px; height: 34px;
+    background: var(--orange);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue'; font-size: 18px; color: white; letter-spacing: 1px;
+  }
+  .brand-name {
+    font-family: 'Bebas Neue'; font-size: 20px; letter-spacing: 3px;
+    color: var(--white);
+  }
+  .brand-sub {
+    font-size: 10px; color: var(--teal2); letter-spacing: 2px;
+    font-family: 'DM Mono'; text-transform: uppercase;
+    margin-left: 2px; margin-top: 1px;
+  }
+  .topbar-right {
+    display: flex; align-items: center; gap: 16px;
+  }
+  #live-clock {
+    font-family: 'DM Mono'; font-size: 15px; color: var(--teal2);
+    letter-spacing: 2px;
+  }
+  .month-badge {
+    background: var(--orange);
+    color: white; font-size: 11px; font-weight: 600;
+    padding: 4px 10px; border-radius: 4px; letter-spacing: 1px;
+  }
+
+  /* ── MAIN LAYOUT ─────────────────────────────────── */
+  .main {
+    position: relative; z-index: 1;
+    max-width: 1180px; margin: 0 auto;
+    padding: 28px 24px 60px;
+  }
+
+  /* ── DATE HERO ───────────────────────────────────── */
+  .date-hero {
+    margin-bottom: 28px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .date-main {
+    font-family: 'Bebas Neue'; font-size: 52px; line-height: 1;
+    color: var(--white); letter-spacing: 2px;
+  }
+  .date-main span { color: var(--orange); }
+  .date-sub {
+    font-size: 12px; color: var(--dim); letter-spacing: 2px;
+    font-family: 'DM Mono'; margin-top: 4px;
+  }
+  .progress-block { text-align: right; }
+  .prog-label { font-size: 11px; color: var(--dim); letter-spacing: 1px; margin-bottom: 6px; }
+  .prog-bar-wrap {
+    width: 200px; height: 8px;
+    background: var(--border); border-radius: 4px; overflow: hidden;
+  }
+  .prog-bar-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, var(--teal), var(--teal2));
+    transition: width 1s ease;
+  }
+  .prog-nums {
+    display: flex; justify-content: space-between;
+    font-family: 'DM Mono'; font-size: 11px;
+    color: var(--dim); margin-top: 4px;
+  }
+  .prog-nums span:last-child { color: var(--teal2); font-weight: 600; }
+
+  /* ── SECTION LABEL ───────────────────────────────── */
+  .section-label {
+    font-family: 'DM Mono'; font-size: 10px; letter-spacing: 3px;
+    color: var(--teal); text-transform: uppercase;
+    margin-bottom: 12px; margin-top: 28px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* ── STAT STRIP ──────────────────────────────────── */
+  .stat-strip {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px; margin-bottom: 4px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 18px;
+    position: relative; overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .stat-card:hover { border-color: var(--teal); }
+  .stat-card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+  }
+  .stat-card.orange::before { background: var(--orange); }
+  .stat-card.teal::before   { background: var(--teal); }
+  .stat-card.green::before  { background: var(--green); }
+  .stat-card.amber::before  { background: var(--amber); }
+  .stat-card.blue::before   { background: #60a5fa; }
+  .stat-label {
+    font-size: 10px; color: var(--dim); letter-spacing: 1px;
+    text-transform: uppercase; margin-bottom: 6px;
+    font-family: 'DM Mono';
+  }
+  .stat-value {
+    font-family: 'Bebas Neue'; font-size: 32px; line-height: 1;
+    color: var(--white);
+  }
+  .stat-value.small { font-size: 20px; }
+  .stat-sub {
+    font-size: 10px; color: var(--dim); margin-top: 4px;
+  }
+
+  /* ── TWO COL ─────────────────────────────────────── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  /* ── PANEL ───────────────────────────────────────── */
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+  }
+  .panel-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .panel-title {
+    font-family: 'Bebas Neue'; font-size: 16px; letter-spacing: 2px;
+    color: var(--white);
+  }
+  .panel-badge {
+    font-size: 9px; letter-spacing: 1px;
+    padding: 3px 8px; border-radius: 3px;
+    font-family: 'DM Mono'; font-weight: 500;
+    text-transform: uppercase;
+  }
+  .panel-badge.orange { background: rgba(232,130,12,0.15); color: var(--orange2); border: 1px solid rgba(232,130,12,0.3); }
+  .panel-badge.teal   { background: rgba(10,126,164,0.15); color: var(--teal2); border: 1px solid rgba(10,126,164,0.3); }
+  .panel-badge.green  { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+  .panel-body { padding: 16px 18px; }
+
+  /* ── AI BRIEF ────────────────────────────────────── */
+  .ai-brief-box {
+    background: linear-gradient(135deg, rgba(10,126,164,0.08), rgba(232,130,12,0.05));
+    border: 1px solid rgba(10,126,164,0.3);
+    border-radius: 12px; padding: 20px 22px;
+    margin-bottom: 4px; position: relative; overflow: hidden;
+  }
+  .ai-brief-box::before {
+    content: '';
+    position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+    background: linear-gradient(to bottom, var(--teal), var(--orange));
+  }
+  .ai-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+  }
+  .ai-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--teal2);
+    box-shadow: 0 0 8px var(--teal2);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; transform: scale(1); }
+    50%      { opacity:0.5; transform: scale(0.8); }
+  }
+  .ai-label {
+    font-family: 'DM Mono'; font-size: 10px; letter-spacing: 2px;
+    color: var(--teal2); text-transform: uppercase;
+  }
+  #ai-brief-text {
+    font-size: 14px; line-height: 1.75; color: #c8dde8;
+    min-height: 60px;
+  }
+  .regen-btn {
+    margin-top: 14px;
+    background: transparent; border: 1px solid var(--border);
+    color: var(--dim); font-size: 11px; padding: 6px 14px;
+    border-radius: 6px; cursor: pointer; font-family: 'DM Mono';
+    letter-spacing: 1px; transition: all 0.2s;
+  }
+  .regen-btn:hover { border-color: var(--teal); color: var(--teal2); }
+
+  /* ── TODAY'S TASKS ───────────────────────────────── */
+  .task-list { display: flex; flex-direction: column; gap: 8px; }
+  .task-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 14px; border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    transition: all 0.2s; cursor: pointer;
+  }
+  .task-item:hover { border-color: rgba(10,126,164,0.4); background: rgba(10,126,164,0.05); }
+  .task-item.done {
+    opacity: 0.45; border-color: transparent;
+    background: transparent;
+  }
+  .task-item.done .task-text { text-decoration: line-through; }
+  .task-check {
+    width: 18px; height: 18px; border-radius: 4px;
+    border: 2px solid var(--border);
+    flex-shrink: 0; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .task-item.done .task-check {
+    background: var(--green); border-color: var(--green);
+  }
+  .task-check::after {
+    content: '✓'; color: white; font-size: 11px; display: none;
+  }
+  .task-item.done .task-check::after { display: block; }
+  .task-text { font-size: 13px; line-height: 1.5; flex: 1; }
+  .task-meta {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .task-tag {
+    font-size: 9px; padding: 2px 7px; border-radius: 3px;
+    font-family: 'DM Mono'; letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .tag-marketing { background: rgba(10,126,164,0.2); color: var(--teal2); }
+  .tag-sales     { background: rgba(34,197,94,0.15); color: var(--green); }
+  .tag-ops       { background: rgba(245,158,11,0.15); color: var(--amber); }
+  .tag-content   { background: rgba(232,130,12,0.15); color: var(--orange2); }
+  .tag-b2b       { background: rgba(167,139,250,0.15); color: #a78bfa; }
+  .tag-zoho      { background: rgba(239,68,68,0.12); color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
+  .task-time { font-size: 10px; color: var(--dim); font-family: 'DM Mono'; }
+
+  /* ── ZOHO QUICK ACTIONS ──────────────────────────── */
+  .zoho-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  }
+  .zoho-btn {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 8px; padding: 16px 10px; border-radius: 10px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    cursor: pointer; text-decoration: none;
+    transition: all 0.2s; color: var(--white);
+  }
+  .zoho-btn:hover { border-color: var(--orange); background: rgba(232,130,12,0.06); transform: translateY(-2px); }
+  .zoho-icon { font-size: 24px; }
+  .zoho-name { font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
+  .zoho-desc { font-size: 9px; color: var(--dim); text-align: center; font-family: 'DM Mono'; }
+
+  /* ── WEEKLY FOCUS ────────────────────────────────── */
+  .week-row {
+    display: flex; gap: 8px; margin-bottom: 8px;
+    align-items: flex-start;
+  }
+  .week-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--teal); flex-shrink: 0; margin-top: 5px;
+  }
+  .week-text { font-size: 13px; line-height: 1.5; color: #c8dde8; }
+  .week-bold { font-weight: 600; color: var(--white); }
+
+  /* ── WEBINAR COUNTDOWN ───────────────────────────── */
+  .webinar-card {
+    background: linear-gradient(135deg, rgba(232,130,12,0.08), transparent);
+    border: 1px solid rgba(232,130,12,0.3);
+    border-radius: 10px; padding: 16px;
+  }
+  .webinar-title { font-family: 'Bebas Neue'; font-size: 18px; letter-spacing: 1px; margin-bottom: 4px; }
+  .webinar-date { font-family: 'DM Mono'; font-size: 11px; color: var(--orange2); margin-bottom: 12px; }
+  .countdown-strip { display: flex; gap: 10px; }
+  .cd-block {
+    background: rgba(0,0,0,0.3); border-radius: 6px;
+    padding: 8px 14px; text-align: center;
+    border: 1px solid var(--border);
+  }
+  .cd-num { font-family: 'Bebas Neue'; font-size: 26px; line-height: 1; color: var(--orange2); }
+  .cd-label { font-size: 9px; color: var(--dim); font-family: 'DM Mono'; letter-spacing: 1px; }
+
+  /* ── ENROLLMENT PROGRESS ─────────────────────────── */
+  .enrl-months { display: flex; flex-direction: column; gap: 10px; }
+  .enrl-row { display: flex; align-items: center; gap: 10px; }
+  .enrl-month { font-family: 'DM Mono'; font-size: 10px; color: var(--dim); width: 32px; flex-shrink: 0; }
+  .enrl-bar-wrap { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .enrl-bar { height: 100%; border-radius: 3px; transition: width 1.2s ease; }
+  .enrl-nums { font-family: 'DM Mono'; font-size: 10px; color: var(--dim); width: 50px; text-align: right; }
+  .enrl-nums.active { color: var(--teal2); font-weight: 600; }
+
+  /* ── MORNING ROUTINE ─────────────────────────────── */
+  .routine-list { display: flex; flex-direction: column; gap: 6px; }
+  .routine-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+  }
+  .routine-item:hover { background: rgba(10,126,164,0.06); }
+  .routine-time { font-family: 'DM Mono'; font-size: 11px; color: var(--orange2); width: 48px; flex-shrink: 0; }
+  .routine-text { font-size: 13px; color: #c8dde8; flex: 1; }
+  .routine-app  { font-family: 'DM Mono'; font-size: 10px; color: var(--dim); }
+  .routine-item.r-orange { border-left-color: var(--orange); }
+  .routine-item.r-teal   { border-left-color: var(--teal); }
+  .routine-item.r-green  { border-left-color: var(--green); }
+  .routine-item.r-amber  { border-left-color: var(--amber); }
+
+  /* ── EMAIL TEMPLATES ─────────────────────────────── */
+  .template-card {
+    border: 1px solid var(--border); border-radius: 10px;
+    overflow: hidden; margin-bottom: 10px;
+  }
+  .template-hdr {
+    background: rgba(255,255,255,0.03);
+    padding: 10px 14px; display: flex; align-items: center;
+    justify-content: space-between; cursor: pointer;
+    font-size: 13px; font-weight: 500;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  .template-hdr:hover { background: rgba(10,126,164,0.08); border-bottom-color: var(--border); }
+  .template-body {
+    display: none; padding: 14px;
+    font-size: 12px; line-height: 1.8; color: #a0bbc8;
+    background: rgba(0,0,0,0.2);
+    font-family: 'DM Mono';
+    white-space: pre-wrap;
+  }
+  .template-body.open { display: block; }
+  .copy-btn {
+    background: var(--teal); color: white; border: none;
+    font-size: 10px; padding: 4px 10px; border-radius: 4px;
+    cursor: pointer; font-family: 'DM Mono'; letter-spacing: 1px;
+    transition: background 0.2s;
+  }
+  .copy-btn:hover { background: var(--teal2); }
+
+  /* ── MONTH SELECTOR ──────────────────────────────── */
+  .month-tabs {
+    display: flex; gap: 8px; margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .month-tab {
+    padding: 6px 16px; border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent; color: var(--dim);
+    font-size: 12px; font-family: 'DM Mono';
+    cursor: pointer; transition: all 0.2s;
+  }
+  .month-tab:hover  { border-color: var(--teal); color: var(--teal2); }
+  .month-tab.active { background: var(--teal); border-color: var(--teal); color: white; font-weight: 600; }
+
+  /* ── SCROLLBAR ───────────────────────────────────── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--navy2); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ── TOAST ───────────────────────────────────────── */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--teal); color: white;
+    padding: 10px 18px; border-radius: 8px;
+    font-size: 13px; font-family: 'DM Mono';
+    z-index: 9999; transform: translateY(80px); opacity: 0;
+    transition: all 0.3s; pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ── ANIMATIONS ──────────────────────────────────── */
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(16px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+  .fade-up { animation: fadeUp 0.5s ease both; }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.2s; }
+  .delay-3 { animation-delay: 0.3s; }
+  .delay-4 { animation-delay: 0.4s; }
+  .delay-5 { animation-delay: 0.5s; }
+
+  @media(max-width: 900px) {
+    .stat-strip { grid-template-columns: repeat(3,1fr); }
+    .two-col    { grid-template-columns: 1fr; }
+    .three-col  { grid-template-columns: 1fr 1fr; }
+  }
+  @media(max-width: 600px) {
+    .stat-strip { grid-template-columns: repeat(2,1fr); }
+    .three-col  { grid-template-columns: 1fr; }
+    .zoho-grid  { grid-template-columns: repeat(2,1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-icon">GE</div>
+    <div>
+      <div class="brand-name">Goose Elevate</div>
+      <div class="brand-sub">Command Brief</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div id="live-clock">--:--:--</div>
+    <div class="month-badge" id="current-month-badge">MAR 2025</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- DATE HERO -->
+  <div class="date-hero fade-up">
+    <div>
+      <div class="date-main" id="date-display">TUESDAY, <span>10 MARCH</span> 2026</div>
+      <div class="date-sub" id="week-display">WEEK 2 OF MARCH  ·  LAUNCH & SETUP PHASE  ·  DAY 10 OF PLAN</div>
+    </div>
+    <div class="progress-block">
+      <div class="prog-label">FY ENROLLMENT PROGRESS</div>
+      <div class="prog-bar-wrap">
+        <div class="prog-bar-fill" id="enrl-progress" style="width:0%"></div>
+      </div>
+      <div class="prog-nums">
+        <span id="enrl-actual">0 / 1,000</span>
+        <span id="enrl-pct">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MONTH SELECTOR -->
+  <div class="month-tabs fade-up delay-1" id="month-tabs">
+    <button class="month-tab active" onclick="setMonth('mar')">MAR</button>
+    <button class="month-tab" onclick="setMonth('apr')">APR</button>
+    <button class="month-tab" onclick="setMonth('may')">MAY</button>
+    <button class="month-tab" onclick="setMonth('jun')">JUN</button>
+    <button class="month-tab" onclick="setMonth('jul')">JUL</button>
+    <button class="month-tab" onclick="setMonth('aug')">AUG</button>
+    <button class="month-tab" onclick="setMonth('sep')">SEP</button>
+  </div>
+
+  <!-- STAT STRIP -->
+  <div class="stat-strip fade-up delay-1">
+    <div class="stat-card orange">
+      <div class="stat-label">Target Enrl</div>
+      <div class="stat-value" id="stat-target">50</div>
+      <div class="stat-sub">This month</div>
+    </div>
+    <div class="stat-card teal">
+      <div class="stat-label">Leads Needed</div>
+      <div class="stat-value" id="stat-leads">500</div>
+      <div class="stat-sub">Webinar + Ads + Organic</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-label">Revenue Target</div>
+      <div class="stat-value small" id="stat-rev">₹32.5L</div>
+      <div class="stat-sub">@ ₹65K/enrollment</div>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-label">Webinar</div>
+      <div class="stat-value small" id="stat-webinar">PLC Basics</div>
+      <div class="stat-sub" id="stat-webinar-date">Mar 2025</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-label">Phase</div>
+      <div class="stat-value small" id="stat-phase">LAUNCH</div>
+      <div class="stat-sub" id="stat-phase-sub">Setup + First Webinar</div>
+    </div>
+  </div>
+
+  <!-- AI BRIEF -->
+  <div class="section-label fade-up delay-2">🤖  AI MORNING BRIEF</div>
+  <div class="ai-brief-box fade-up delay-2">
+    <div class="ai-header">
+      <div class="ai-dot"></div>
+      <div class="ai-label">Goose Elevate Intelligence · Updated for Today</div>
+    </div>
+    <div id="ai-brief-text">Generating your morning brief…</div>
+    <button class="regen-btn" onclick="generateBrief()">↻ Regenerate Brief</button>
+  </div>
+
+  <!-- TODAY'S TASKS + ZOHO -->
+  <div class="section-label fade-up delay-2">📋  TODAY'S ACTION LIST</div>
+  <div class="two-col fade-up delay-3">
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Morning Priorities</div>
+        <div class="panel-badge orange" id="tasks-done-badge">0 / 6 DONE</div>
+      </div>
+      <div class="panel-body">
+        <div class="task-list" id="task-list"></div>
+      </div>
+    </div>
+
+    <div>
+      <!-- ZOHO QUICK LAUNCH -->
+      <div class="panel" style="margin-bottom:16px">
+        <div class="panel-header">
+          <div class="panel-title">Zoho Quick Launch</div>
+          <div class="panel-badge teal">INTEGRATED</div>
+        </div>
+        <div class="panel-body">
+          <div class="zoho-grid">
+            <a class="zoho-btn" href="https://mail.zoho.in" target="_blank">
+              <div class="zoho-icon">📧</div>
+              <div class="zoho-name">Zoho Mail</div>
+              <div class="zoho-desc">Open inbox</div>
+            </a>
+            <a class="zoho-btn" href="https://meeting.zoho.in" target="_blank">
+              <div class="zoho-icon">📹</div>
+              <div class="zoho-name">Zoho Meeting</div>
+              <div class="zoho-desc">Start / join</div>
+            </a>
+            <a class="zoho-btn" href="https://crm.zoho.in" target="_blank">
+              <div class="zoho-icon">🎯</div>
+              <div class="zoho-name">Zoho CRM</div>
+              <div class="zoho-desc">Leads & deals</div>
+            </a>
+            <a class="zoho-btn" href="https://projects.zoho.in" target="_blank">
+              <div class="zoho-icon">📌</div>
+              <div class="zoho-name">Zoho Projects</div>
+              <div class="zoho-desc">Task tracker</div>
+            </a>
+            <a class="zoho-btn" href="https://cliq.zoho.in" target="_blank">
+              <div class="zoho-icon">💬</div>
+              <div class="zoho-name">Zoho Cliq</div>
+              <div class="zoho-desc">Team chat</div>
+            </a>
+            <a class="zoho-btn" href="https://campaigns.zoho.in" target="_blank">
+              <div class="zoho-icon">📢</div>
+              <div class="zoho-name">Zoho Campaigns</div>
+              <div class="zoho-desc">Email blasts</div>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- WEBINAR COUNTDOWN -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Next Webinar</div>
+          <div class="panel-badge orange">COUNTDOWN</div>
+        </div>
+        <div class="panel-body">
+          <div class="webinar-card">
+            <div class="webinar-title" id="webinar-name">PLC for Process Engineers</div>
+            <div class="webinar-date" id="webinar-target-date">Target: Late March 2025</div>
+            <div class="countdown-strip">
+              <div class="cd-block"><div class="cd-num" id="cd-days">21</div><div class="cd-label">DAYS</div></div>
+              <div class="cd-block"><div class="cd-num" id="cd-hrs">0</div><div class="cd-label">HRS</div></div>
+              <div class="cd-block"><div class="cd-num" id="cd-min">0</div><div class="cd-label">MIN</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MORNING ROUTINE + ENROLLMENT CHART -->
+  <div class="section-label fade-up delay-3">⏰  DAILY ROUTINE + ENROLLMENT MAP</div>
+  <div class="two-col fade-up delay-4">
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Your Morning Routine</div>
+        <div class="panel-badge teal">7AM – 11AM</div>
+      </div>
+      <div class="panel-body">
+        <div class="routine-list">
+          <div class="routine-item r-orange">
+            <div class="routine-time">7:00</div>
+            <div class="routine-text">Read this brief. Set today's 3 non-negotiable tasks.</div>
+            <div class="routine-app">Browser</div>
+          </div>
+          <div class="routine-item r-teal">
+            <div class="routine-time">7:15</div>
+            <div class="routine-text">Check Zoho Mail — reply to any enrollment queries first.</div>
+            <div class="routine-app">Zoho Mail</div>
+          </div>
+          <div class="routine-item r-teal">
+            <div class="routine-time">7:30</div>
+            <div class="routine-text">Check Zoho CRM — update lead status from yesterday's calls.</div>
+            <div class="routine-app">Zoho CRM</div>
+          </div>
+          <div class="routine-item r-green">
+            <div class="routine-time">8:00</div>
+            <div class="routine-text">Post today's LinkedIn content (use template below). Share to Cliq.</div>
+            <div class="routine-app">LinkedIn + Cliq</div>
+          </div>
+          <div class="routine-item r-amber">
+            <div class="routine-time">8:30</div>
+            <div class="routine-text">Make 5 outbound B2B / lead follow-up calls. Log in CRM.</div>
+            <div class="routine-app">Phone + CRM</div>
+          </div>
+          <div class="routine-item r-orange">
+            <div class="routine-time">9:30</div>
+            <div class="routine-text">Team standup on Zoho Cliq — 10 min. Share enrollment count.</div>
+            <div class="routine-app">Zoho Cliq</div>
+          </div>
+          <div class="routine-item r-teal">
+            <div class="routine-time">10:00</div>
+            <div class="routine-text">Work on webinar prep OR batch coordination (as per this week's priority).</div>
+            <div class="routine-app">Zoho Projects</div>
+          </div>
+          <div class="routine-item r-green">
+            <div class="routine-time">11:00</div>
+            <div class="routine-text">Log daily numbers: leads added, calls made, enrollments confirmed.</div>
+            <div class="routine-app">Google Sheet / CRM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Enrollment Target Map</div>
+        <div class="panel-badge green">FY PLAN</div>
+      </div>
+      <div class="panel-body">
+        <div class="enrl-months" id="enrl-chart"></div>
+        <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border);">
+          <div style="display:flex; justify-content:space-between; font-family:'DM Mono'; font-size:11px; color:var(--dim); margin-bottom:6px;">
+            <span>TOTAL TARGET</span><span style="color:var(--teal2)">1,000</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-family:'DM Mono'; font-size:11px; color:var(--dim); margin-bottom:6px;">
+            <span>GROSS REVENUE</span><span style="color:var(--green)">₹6.50 CRORE</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-family:'DM Mono'; font-size:11px; color:var(--dim);">
+            <span>MARKETING BUDGET</span><span style="color:var(--amber)">₹3.85 LAKH (0.6%)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEKLY FOCUS -->
+  <div class="section-label fade-up delay-4">📅  THIS WEEK'S FOCUS</div>
+  <div class="two-col fade-up delay-4">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Marketing Actions</div>
+        <div class="panel-badge teal">WEEK OF MAR 10</div>
+      </div>
+      <div class="panel-body" id="weekly-marketing"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Sales / Conversion Actions</div>
+        <div class="panel-badge green">WEEK OF MAR 10</div>
+      </div>
+      <div class="panel-body" id="weekly-sales"></div>
+    </div>
+  </div>
+
+  <!-- ZOHO EMAIL TEMPLATES -->
+  <div class="section-label fade-up delay-5">📨  READY-TO-SEND ZOHO MAIL TEMPLATES</div>
+  <div class="fade-up delay-5" id="email-templates"></div>
+
+  <!-- TEAM MESSAGE -->
+  <div class="section-label fade-up delay-5">💬  DAILY TEAM MESSAGE (Zoho Cliq / WhatsApp)</div>
+  <div class="panel fade-up delay-5">
+    <div class="panel-header">
+      <div class="panel-title">Copy & Send to Team</div>
+      <div class="panel-badge orange">MORNING STANDUP</div>
+    </div>
+    <div class="panel-body">
+      <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:16px; font-family:'DM Mono'; font-size:12px; line-height:1.8; color:#a0bbc8; white-space:pre-wrap;" id="team-message"></div>
+      <button class="copy-btn" style="margin-top:12px; padding:8px 18px; font-size:11px;" onclick="copyTeamMsg()">📋 Copy to Clipboard</button>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div class="toast" id="toast">Copied to clipboard ✓</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+const PLAN = {
+  mar: {
+    phase: "LAUNCH", phaseSub: "Setup + First Webinar",
+    target: 50, leads: 500, rev: "₹32.5L",
+    webinar: "PLC for Process Engineers", webinarDate: "Late March 2025",
+    tasks: [
+      { text: "Finalise LMS platform — confirm login access for coordinator", tag: "ops", time: "7:30 AM", zoho: "Projects" },
+      { text: "Test remote lab access — Pune + Kochi connection check", tag: "ops", time: "8:00 AM", zoho: "Meeting" },
+      { text: "Post LinkedIn intro: 'Goose Elevate is live — here's why I built it'", tag: "content", time: "8:30 AM", zoho: null },
+      { text: "Email 10 existing Goose dairy/FMCG clients about Elevate launch", tag: "b2b", time: "9:00 AM", zoho: "Mail" },
+      { text: "Create Webinar 1 registration page on Zoho Meeting / Zoom", tag: "marketing", time: "10:00 AM", zoho: "Meeting" },
+      { text: "Draft enrollment brochure PDF (2 pages) — share with Coordinator", tag: "ops", time: "11:00 AM", zoho: "Cliq" },
+    ],
+    weeklyMarketing: [
+      "Create Webinar 1 registration page & LinkedIn event",
+      "Post 3 LinkedIn posts this week (Mon, Wed, Fri)",
+      "WhatsApp blast to Goose contact database (500+ contacts)",
+      "Set up Zoho Campaigns account for email marketing",
+    ],
+    weeklySales: [
+      "Call 10 existing Goose clients — announce Elevate",
+      "Send enrollment info email to all client contacts in CRM",
+      "Build lead tracking spreadsheet in Zoho CRM",
+      "Target: 5 enrollment conversations started by Friday",
+    ],
+  },
+  apr: {
+    phase: "BATCH 1", phaseSub: "Launch + First Webinar",
+    target: 130, leads: 800, rev: "₹84.5L",
+    webinar: "Troubleshooting PLC Panels", webinarDate: "Mid April 2025",
+    tasks: [
+      { text: "Onboard Batch 1 learners — send welcome email with LMS login", tag: "ops", time: "8:00 AM", zoho: "Mail" },
+      { text: "Launch LinkedIn + Google Ads (₹40K budget) — set up campaigns", tag: "marketing", time: "9:00 AM", zoho: null },
+      { text: "Post LinkedIn: 'Batch 1 is live — meet your trainer'", tag: "content", time: "8:30 AM", zoho: null },
+      { text: "Host Webinar 2: Troubleshooting PLC Panels — promote via Zoho Meeting", tag: "marketing", time: "Scheduled", zoho: "Meeting" },
+      { text: "B2B: Schedule 5 meetings with dairy/FMCG plant L&D heads via Zoho CRM", tag: "b2b", time: "10:00 AM", zoho: "CRM" },
+      { text: "WhatsApp alumni group — add all Batch 1 learners, pin referral info", tag: "ops", time: "11:00 AM", zoho: null },
+    ],
+    weeklyMarketing: [
+      "Run LinkedIn Ad for Webinar 2 (₹8K budget this week)",
+      "Post 3 LinkedIn posts (lab tour, trainer intro, curriculum)",
+      "Upload Webinar 1 recording to YouTube channel",
+      "Create Webinar 2 registration page on Zoho Meeting",
+    ],
+    weeklySales: [
+      "Call all March leads who attended Webinar 1 — push conversion",
+      "Send enrollment offer: 'Enroll by Apr 15 — priority batch access'",
+      "Log all calls in Zoho CRM — track stage (interested / follow-up / enrolled)",
+      "Email 20 plant HR contacts via Zoho Campaigns",
+    ],
+  },
+  may: {
+    phase: "SCALE", phaseSub: "Batch 1 Running + Webinar 3",
+    target: 130, leads: 800, rev: "₹84.5L",
+    webinar: "VFD & Drives — Real Plant Demo", webinarDate: "Mid May 2025",
+    tasks: [
+      { text: "Referral push — email all Batch 1 learners their referral link", tag: "sales", time: "8:00 AM", zoho: "Campaigns" },
+      { text: "Increase ad budget to ₹15K/week — LinkedIn + Google performance review", tag: "marketing", time: "9:00 AM", zoho: null },
+      { text: "Corporate outreach: send group booking proposal to 3 plant companies", tag: "b2b", time: "9:30 AM", zoho: "Mail" },
+      { text: "Prepare Webinar 3 slide deck — live G120 VFD demo planned", tag: "content", time: "10:00 AM", zoho: "Projects" },
+      { text: "Post LinkedIn: Batch 1 Week 2 highlight (student learning moment)", tag: "content", time: "8:30 AM", zoho: null },
+      { text: "Conversion call — follow up all May leads in CRM (target 10 calls today)", tag: "sales", time: "11:00 AM", zoho: "CRM" },
+    ],
+    weeklyMarketing: [
+      "Webinar 3 promo: 3 LinkedIn posts + paid ad (₹8K)",
+      "Post Batch 1 testimonial / progress update",
+      "YouTube: upload 1 short tutorial video (lead magnet)",
+      "WhatsApp blast to full database about upcoming webinar",
+    ],
+    weeklySales: [
+      "Call top 40 Webinar 2 leads — push 'Batch 2 seats open'",
+      "Send 2 corporate group booking proposals via Zoho Mail",
+      "Referral: first rewards distributed — post on WhatsApp group",
+      "Conversion target this week: 30 enrollments",
+    ],
+  },
+  jun: {
+    phase: "SCALE + B2B", phaseSub: "Offline Event + Webinar 3",
+    target: 180, leads: 1050, rev: "₹1.17 Cr",
+    webinar: "Automation for Pasteurizer", webinarDate: "Mid June 2025",
+    tasks: [
+      { text: "Prepare for offline demo event — confirm venue (Pune), 50 attendees", tag: "ops", time: "8:00 AM", zoho: "Projects" },
+      { text: "B2B follow-up: Call 5 dairy/FMCG plant managers (warm leads)", tag: "b2b", time: "9:00 AM", zoho: "CRM" },
+      { text: "Post LinkedIn: 'How we automated a pasteurizer — live project case study'", tag: "content", time: "8:30 AM", zoho: null },
+      { text: "Referral push to Batch 1 learners — target 15 referrals this month", tag: "sales", time: "10:00 AM", zoho: "Campaigns" },
+      { text: "Batch 2 enrollment confirmations — send welcome emails", tag: "ops", time: "11:00 AM", zoho: "Mail" },
+      { text: "Prepare Webinar 3 (Automation Pasteurizer) — confirm demo setup", tag: "marketing", time: "10:30 AM", zoho: "Meeting" },
+    ],
+    weeklyMarketing: [
+      "Offline event prep — Pune venue, invites, agenda",
+      "Webinar 3 LinkedIn ads (₹10K) targeting F&B engineers",
+      "Post 3 LinkedIn pieces (dairy automation, pasteurizer case study)",
+      "YouTube video: 'How a CIP system works' (educational lead magnet)",
+    ],
+    weeklySales: [
+      "Close 2 corporate group bookings (target: 10+ engineers each)",
+      "Batch 2 enrollment: confirm 30 seats this week",
+      "Referral: email all active learners with referral instructions",
+      "Log 15 B2B calls in Zoho CRM this week",
+    ],
+  },
+  jul: {
+    phase: "PEAK PUSH", phaseSub: "Mid-Year Review + Webinar 4",
+    target: 210, leads: 1200, rev: "₹1.37 Cr",
+    webinar: "IIoT & Industry 4.0", webinarDate: "Mid July 2025",
+    tasks: [
+      { text: "Mid-year review: check cumulative vs 570 target (cumulative at Jul start)", tag: "ops", time: "8:00 AM", zoho: "Projects" },
+      { text: "Webinar 4 LinkedIn ad launch — ₹8K budget, 'IIoT for Plant Engineers'", tag: "marketing", time: "9:00 AM", zoho: null },
+      { text: "B2B: 10 new plant company outreaches via LinkedIn + Zoho CRM", tag: "b2b", time: "9:30 AM", zoho: "CRM" },
+      { text: "Post learner success story on LinkedIn (Month 2 completion)", tag: "content", time: "8:30 AM", zoho: null },
+      { text: "YouTube: upload 'Day in life of automation engineer' video", tag: "content", time: "10:00 AM", zoho: null },
+      { text: "Send referral reminder to all active learners via Zoho Campaigns", tag: "sales", time: "11:00 AM", zoho: "Campaigns" },
+    ],
+    weeklyMarketing: [
+      "Webinar 4 full promo: LinkedIn + Google (₹12K ads this week)",
+      "Mid-year Elevate impact post: '350 engineers trained so far'",
+      "YouTube tutorials × 2 uploads for organic traffic",
+      "IIoT content series: 3 LinkedIn posts Mon/Wed/Fri",
+    ],
+    weeklySales: [
+      "All-hands on conversion: target 55 enrollments this week",
+      "Batch 3 seats pre-opening — collect expressions of interest",
+      "WhatsApp blast: 'August batch filling fast — only 50 seats left'",
+      "ISRO / marine segment: 5 targeted outreach emails via Zoho Mail",
+    ],
+  },
+  aug: {
+    phase: "CORPORATE DRIVE", phaseSub: "Kochi Event + Webinar 5",
+    target: 220, leads: 1170, rev: "₹1.43 Cr",
+    webinar: "Career in Automation", webinarDate: "Mid August 2025",
+    tasks: [
+      { text: "Prepare for offline event — Kochi (60 attendees), confirm date + venue", tag: "ops", time: "8:00 AM", zoho: "Projects" },
+      { text: "Target 10 engineering college placement cells — email + call campaign", tag: "b2b", time: "9:00 AM", zoho: "Campaigns" },
+      { text: "Post LinkedIn: 'Student placed as automation engineer — Goose Elevate story'", tag: "content", time: "8:30 AM", zoho: null },
+      { text: "Corporate L&D: 5 plant company demos via Zoho Meeting this week", tag: "b2b", time: "10:00 AM", zoho: "Meeting" },
+      { text: "Referral leaderboard: post top 3 referrers + reward announcement", tag: "sales", time: "11:00 AM", zoho: "Cliq" },
+      { text: "Testimonial video: record 2 student success stories (short reel)", tag: "content", time: "10:30 AM", zoho: null },
+    ],
+    weeklyMarketing: [
+      "Webinar 5 promo: 'Career in Automation' — fresh grad targeting (₹10K ads)",
+      "Kochi event invites — WhatsApp + LinkedIn + email",
+      "YouTube: '3 reasons automation engineers earn more' (high share potential)",
+      "Post 3 LinkedIn pieces: salary data, career paths, alumni spotlight",
+    ],
+    weeklySales: [
+      "Sep batch: 90% full target — 10 corporate seats + 10 referrals + conversions",
+      "Top referrer reward: announce + pay out ₹2K per referral",
+      "Alumni testimonial video: post + boost with ₹3K ad",
+      "College placement officers: send formal Elevate pitch deck",
+    ],
+  },
+  sep: {
+    phase: "FINAL SPRINT", phaseSub: "Close 1,000 + Certificate Ceremony",
+    target: 210, leads: 1000, rev: "₹1.37 Cr",
+    webinar: "Panel Design & IEC 61439", webinarDate: "Mid September 2025",
+    tasks: [
+      { text: "Final B2B push: call 10 warm corporate contacts — 'Last batch of the year'", tag: "b2b", time: "8:30 AM", zoho: "CRM" },
+      { text: "Webinar 6 campaign: 'Group of 5 get 1 free' urgency offer via Campaigns", tag: "marketing", time: "9:00 AM", zoho: "Campaigns" },
+      { text: "Certificate ceremony logistics: confirm virtual + Pune/Kochi venues", tag: "ops", time: "10:00 AM", zoho: "Projects" },
+      { text: "Post: '950 engineers trained — 50 seats remain. This is the final call.'", tag: "content", time: "8:30 AM", zoho: null },
+      { text: "Early bird FY26 campaign: create teaser + collect early interest", tag: "sales", time: "11:00 AM", zoho: "Mail" },
+      { text: "All leads in CRM: personal call + final offer. Close the year.", tag: "sales", time: "9:30 AM", zoho: "CRM" },
+    ],
+    weeklyMarketing: [
+      "Webinar 6 max promo: LinkedIn + Google (₹12K — final push)",
+      "Certificate ceremony announcement — LinkedIn post + WhatsApp",
+      "Year-end impact reel: '1,000 engineers. 6 months. Goose Elevate.'",
+      "FY26 early bird teaser — create waiting list landing page",
+    ],
+    weeklySales: [
+      "Every remaining lead gets a personal call from Jithin",
+      "Final group offer: 'Book 5 seats, get ₹5K off per seat'",
+      "All pending CRM leads: mark won/lost before month end",
+      "Batch closure: send final welcome emails to last enrollees",
+    ],
+  },
+};
+
+const EMAIL_TEMPLATES = {
+  mar: [
+    {
+      title: "📧 To: Existing Goose Clients — Elevate Launch Announcement",
+      subject: "Goose Elevate is Live — Upskill Your Automation Team",
+      body: `Dear [Name],
+
+I'm excited to share that we've launched Goose Elevate — a structured 6-month industrial automation training program developed by our engineering team at Goose Industrial Solutions.
+
+This program is built for working engineers and fresh graduates who want hands-on training in:
+• Siemens PLC (S7-1200/1500) + TIA Portal
+• WinCC SCADA & HMI Configuration
+• VFD, Servo Drives & Motion Control
+• Panel Design, Wiring & Commissioning
+
+Key highlights:
+✅ 240 hours | 2 hours/day | Online + Remote Lab access (Pune & Kochi)
+✅ Designed by engineers with 10+ years of real project experience
+✅ Certificate upon completion
+✅ Batch starts April 2025
+
+Fee: ₹65,000 per engineer (group rates available for 5+ from your team)
+
+I'd love to discuss how this can benefit your team. Can we connect for a quick 20-minute call this week?
+
+Warm regards,
+Jithin Eliyas
+Director – Goose Industrial Solutions
++91 [your number]`
+    },
+    {
+      title: "📧 To: Webinar Registrants — Enrollment Follow-Up",
+      subject: "Your Spot is Reserved — Goose Elevate Batch Starts Soon",
+      body: `Dear [Name],
+
+Thank you for attending our webinar on [Topic].
+
+Based on your interest, I believe Goose Elevate would be the right next step for you. Here's a quick summary:
+
+🎓 Program: Professional Training in Industrial Automation
+📅 Duration: 6 months | 240 hours | 2 hrs/day
+💻 Mode: Online with Remote Lab access (Pune + Kochi)
+📜 Certificate: Yes, upon completion
+💰 Fee: ₹65,000 (EMI available)
+
+Batch filling fast — only [X] seats available.
+
+To enroll or ask questions, reply to this email or call me directly.
+
+I personally review every application. Happy to answer any questions.
+
+Jithin Eliyas | Goose Industrial Solutions`
+    },
+  ],
+  b2b: [
+    {
+      title: "📧 To: Plant HR / L&D Head — Group Enrollment Pitch",
+      subject: "Train Your Automation Team — Goose Elevate Group Rate Available",
+      body: `Dear [HR/L&D Manager Name],
+
+I'm Jithin Eliyas, Director at Goose Industrial Solutions — we've worked with [Company] on [project reference if applicable].
+
+We've just launched Goose Elevate, a 6-month industrial automation training program for plant engineers. Given your team's background in [industry], I believe this could be highly valuable.
+
+What makes this different:
+• Real remote lab access — not just videos
+• Siemens PLC, WinCC SCADA, VFD/Drives, Panel Design
+• Designed by engineers who've delivered 40+ automation projects
+• Group rate: enroll 5+ engineers from your team at ₹60,000/engineer
+
+We can arrange a customised demo session for your team before commitment.
+
+Would you be open to a 20-minute call this week to discuss?
+
+Best regards,
+Jithin Eliyas
+Director, Goose Industrial Solutions
+gooseindustrial.com`
+    },
+  ],
+};
+
+const WEBINARS_BY_MONTH = {
+  mar: { name: "PLC for Process Engineers", date: new Date(2025, 2, 28) },
+  apr: { name: "Troubleshooting PLC Panels", date: new Date(2025, 3, 18) },
+  may: { name: "VFD & Drives — Live Lab Demo", date: new Date(2025, 4, 16) },
+  jun: { name: "Automation for Pasteurizer", date: new Date(2025, 5, 13) },
+  jul: { name: "IIoT & Industry 4.0", date: new Date(2025, 6, 18) },
+  aug: { name: "Career in Automation", date: new Date(2025, 7, 15) },
+  sep: { name: "Panel Design & IEC 61439", date: new Date(2025, 8, 12) },
+};
+
+const MONTHLY_TARGETS = [
+  { month: "MAR", target: 50,  cumulative: 50 },
+  { month: "APR", target: 130, cumulative: 180 },
+  { month: "MAY", target: 130, cumulative: 310 },
+  { month: "JUN", target: 180, cumulative: 490 },
+  { month: "JUL", target: 210, cumulative: 700 },
+  { month: "AUG", target: 220, cumulative: 920 },
+  { month: "SEP", target: 210, cumulative: 1130 },
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let currentMonth = 'mar';
+let taskStates = {};
+const DONE_KEY = 'elevate_tasks_';
+
+function getTaskKey() { return DONE_KEY + currentMonth; }
+function loadTaskStates() {
+  try { taskStates = JSON.parse(localStorage.getItem(getTaskKey()) || '{}'); }
+  catch(e) { taskStates = {}; }
+}
+function saveTaskStates() {
+  try { localStorage.setItem(getTaskKey(), JSON.stringify(taskStates)); }
+  catch(e) {}
+}
+
+// ── CLOCK ─────────────────────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  document.getElementById('live-clock').textContent =
+    now.toLocaleTimeString('en-IN', { hour12: false });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── DATE DISPLAY ──────────────────────────────────────────────────────────────
+function updateDateDisplay() {
+  const now = new Date();
+  const days = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+  const months = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+  const d = `${days[now.getDay()]}, <span>${now.getDate()} ${months[now.getMonth()]}</span>`;
+  document.getElementById('date-display').innerHTML = d;
+  const weekNum = Math.ceil(now.getDate() / 7);
+  const monthName = months[now.getMonth()];
+  const plan = PLAN[currentMonth];
+  document.getElementById('week-display').textContent =
+    `WEEK ${weekNum} OF ${monthName}  ·  ${plan.phase} PHASE  ·  GOOSE ELEVATE FY 2025–26`;
+  document.getElementById('current-month-badge').textContent =
+    `${monthName.slice(0,3)} ${now.getFullYear()}`;
+}
+
+// ── ENROLLMENT PROGRESS ───────────────────────────────────────────────────────
+function updateProgress(month) {
+  const idx = ['mar','apr','may','jun','jul','aug','sep'].indexOf(month);
+  const cumul = idx >= 0 ? MONTHLY_TARGETS[idx].cumulative : 0;
+  const pct = Math.min(100, Math.round(cumul / 10));
+  setTimeout(() => {
+    document.getElementById('enrl-progress').style.width = pct + '%';
+  }, 300);
+  document.getElementById('enrl-actual').textContent = `${cumul} / 1,000`;
+  document.getElementById('enrl-pct').textContent = pct + '%';
+}
+
+// ── CHART ─────────────────────────────────────────────────────────────────────
+function renderEnrollmentChart() {
+  const container = document.getElementById('enrl-chart');
+  container.innerHTML = '';
+  MONTHLY_TARGETS.forEach((m, i) => {
+    const pct = Math.round(m.target / 230 * 100);
+    const isActive = ['mar','apr','may','jun','jul','aug','sep'][i] === currentMonth;
+    const colors = ['#0A7EA4','#E8820C','#22c55e','#a78bfa','#f59e0b','#60a5fa','#fb7185'];
+    container.innerHTML += `
+      <div class="enrl-row">
+        <div class="enrl-month">${m.month}</div>
+        <div class="enrl-bar-wrap">
+          <div class="enrl-bar" style="width:${pct}%;background:${isActive ? '#E8820C' : colors[i]}"></div>
+        </div>
+        <div class="enrl-nums ${isActive ? 'active' : ''}">${m.target} enrl</div>
+      </div>`;
+  });
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+function updateStats(month) {
+  const p = PLAN[month];
+  document.getElementById('stat-target').textContent = p.target;
+  document.getElementById('stat-leads').textContent = p.leads.toLocaleString();
+  document.getElementById('stat-rev').textContent = p.rev;
+  document.getElementById('stat-webinar').textContent = p.webinar.split(' — ')[0];
+  document.getElementById('stat-webinar').style.fontSize = p.webinar.length > 15 ? '14px' : '20px';
+  document.getElementById('stat-webinar-date').textContent = p.webinarDate;
+  document.getElementById('stat-phase').textContent = p.phase;
+  document.getElementById('stat-phase-sub').textContent = p.phaseSub;
+}
+
+// ── TASKS ─────────────────────────────────────────────────────────────────────
+function renderTasks(month) {
+  loadTaskStates();
+  const tasks = PLAN[month].tasks;
+  const container = document.getElementById('task-list');
+  container.innerHTML = '';
+  let doneCount = 0;
+  tasks.forEach((task, i) => {
+    const isDone = !!taskStates[i];
+    if (isDone) doneCount++;
+    const zohoLink = task.zoho ? `<span class="task-tag tag-zoho">→ Zoho ${task.zoho}</span>` : '';
+    container.innerHTML += `
+      <div class="task-item ${isDone ? 'done' : ''}" onclick="toggleTask(${i})">
+        <div class="task-check"></div>
+        <div>
+          <div class="task-text">${task.text}</div>
+          <div class="task-meta">
+            <span class="task-tag tag-${task.tag}">${task.tag.toUpperCase()}</span>
+            <span class="task-time">${task.time}</span>
+            ${zohoLink}
+          </div>
+        </div>
+      </div>`;
+  });
+  document.getElementById('tasks-done-badge').textContent = `${doneCount} / ${tasks.length} DONE`;
+}
+
+function toggleTask(i) {
+  loadTaskStates();
+  taskStates[i] = !taskStates[i];
+  saveTaskStates();
+  renderTasks(currentMonth);
+}
+
+// ── WEEKLY ────────────────────────────────────────────────────────────────────
+function renderWeekly(month) {
+  const p = PLAN[month];
+  ['weeklyMarketing','weeklySales'].forEach((key, ki) => {
+    const el = document.getElementById(ki === 0 ? 'weekly-marketing' : 'weekly-sales');
+    el.innerHTML = '<div class="routine-list">' +
+      p[key].map(item => `
+        <div class="routine-item ${ki===0?'r-teal':'r-green'}">
+          <div class="week-dot" style="flex-shrink:0;margin-top:2px"></div>
+          <div class="week-text">${item}</div>
+        </div>`).join('') +
+      '</div>';
+  });
+}
+
+// ── WEBINAR COUNTDOWN ─────────────────────────────────────────────────────────
+function updateCountdown(month) {
+  const wdata = WEBINARS_BY_MONTH[month];
+  if (!wdata) return;
+  document.getElementById('webinar-name').textContent = wdata.name;
+  const now = new Date();
+  const diff = wdata.date - now;
+  if (diff < 0) {
+    document.getElementById('cd-days').textContent = '—';
+    document.getElementById('cd-hrs').textContent = '—';
+    document.getElementById('cd-min').textContent = '—';
+    document.getElementById('webinar-target-date').textContent = 'Completed';
+    return;
+  }
+  const days = Math.floor(diff / (1000*60*60*24));
+  const hrs  = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+  const min  = Math.floor((diff % (1000*60*60)) / (1000*60));
+  document.getElementById('cd-days').textContent = days;
+  document.getElementById('cd-hrs').textContent = hrs;
+  document.getElementById('cd-min').textContent = min;
+  document.getElementById('webinar-target-date').textContent =
+    wdata.date.toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+}
+
+// ── EMAIL TEMPLATES ───────────────────────────────────────────────────────────
+function renderEmailTemplates(month) {
+  const templates = [
+    ...(EMAIL_TEMPLATES[month] || EMAIL_TEMPLATES.mar),
+    ...EMAIL_TEMPLATES.b2b,
+  ];
+  const container = document.getElementById('email-templates');
+  container.innerHTML = templates.map((t, i) => `
+    <div class="template-card">
+      <div class="template-hdr" onclick="toggleTemplate(${i})">
+        <span>${t.title}</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="font-size:10px;color:var(--dim);font-family:'DM Mono'">Subject: ${t.subject.slice(0,40)}…</span>
+          <button class="copy-btn" onclick="event.stopPropagation();copyTemplate(${i})">Copy</button>
+        </div>
+      </div>
+      <div class="template-body" id="tmpl-${i}">${t.body}</div>
+    </div>`).join('');
+  window._templates = templates;
+}
+
+function toggleTemplate(i) {
+  const el = document.getElementById('tmpl-' + i);
+  el.classList.toggle('open');
+}
+
+function copyTemplate(i) {
+  const t = window._templates[i];
+  const text = `Subject: ${t.subject}\n\n${t.body}`;
+  navigator.clipboard.writeText(text).catch(() => {});
+  showToast('Email template copied! Paste into Zoho Mail ✓');
+}
+
+// ── TEAM MESSAGE ──────────────────────────────────────────────────────────────
+function renderTeamMessage(month) {
+  const p = PLAN[month];
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long' });
+  const msg = `🚀 GOOSE ELEVATE — ${dateStr.toUpperCase()}
+
+📊 MONTH: ${month.toUpperCase()} | PHASE: ${p.phase}
+🎯 Monthly Enrollment Target: ${p.target} enrollments
+💰 Revenue Target: ${p.rev}
+
+TODAY'S FOCUS:
+${p.tasks.slice(0,4).map((t,i) => `${i+1}. ${t.text}`).join('\n')}
+
+WEEKLY MARKETING:
+• ${p.weeklyMarketing[0]}
+• ${p.weeklyMarketing[1]}
+
+WEEKLY SALES:
+• ${p.weeklySales[0]}
+• ${p.weeklySales[1]}
+
+📹 Next Webinar: ${p.webinar}
+📅 ${p.webinarDate}
+
+Let's close strong today. 💪
+— Jithin`;
+  document.getElementById('team-message').textContent = msg;
+}
+
+function copyTeamMsg() {
+  const text = document.getElementById('team-message').textContent;
+  navigator.clipboard.writeText(text).catch(() => {});
+  showToast('Team message copied! Paste into Zoho Cliq / WhatsApp ✓');
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── AI BRIEF ─────────────────────────────────────────────────────────────────
+const BRIEFS = {
+  mar: [
+    "Good morning Jithin. You're in <strong>Week 2 of March</strong> — the most critical setup phase of the entire year. Your first webinar on <strong>PLC for Process Engineers</strong> needs to be promoted starting today. The single most valuable thing you can do this morning: email 10 of your existing Goose dairy/FMCG clients and tell them Elevate is live. These are warm leads — no selling required, just a personal note. Then post your first LinkedIn piece. March needs 50 enrollments. Every day counts.",
+    "Today is a <strong>content and outreach day</strong>. Your LMS should be live, your registration page needs to go up, and your first LinkedIn post should go out before 9 AM. Remember — March sets the tone for the entire FY. The 50 engineers you enroll this month become your testimonials, your referrers, and your social proof for April and beyond. Treat every lead this week like your first customer.",
+    "Your unfair advantage is your <strong>existing client relationships</strong>. No training platform in India can call plant managers at Schreiber, Kerala dairies, or marine companies and say 'I automated your plant, now I'll train your engineers.' Use that today. Five calls to existing clients this morning could yield 15+ enrollments this month alone.",
+  ],
+  apr: [
+    "April is Batch 1 launch month. <strong>130 enrollments is the target</strong> — a significant jump from March. Your ads should be live by now. Today's priority: call every lead who attended Webinar 1 and hasn't enrolled yet. The 'buying window' is 7–10 days post-webinar. After that, urgency fades. Make personal contact today before it's too late.",
+    "You're onboarding your first real learners this month. <strong>First impressions last forever.</strong> Make sure the welcome email is perfect, the LMS works flawlessly, and every Batch 1 learner feels they made the right decision. A happy learner in Week 1 is your best marketing asset by Month 3. Focus on delivery quality alongside enrollment today.",
+  ],
+  may: [
+    "May is the month your engine starts to fire. <strong>Paid ads, webinars, AND referrals</strong> all kick in together. The most important action today: activate your referral program. Every Batch 1 learner who's now 4 weeks in has classmates, colleagues, and friends who could enroll. A personal WhatsApp to each saying 'You'll earn ₹2,000 for every friend you refer' will generate results immediately.",
+    "Webinar 3 on VFD and Drives is your technical deepdive — this audience is <strong>maintenance engineers and panel builders</strong>, a segment that rarely gets targeted. They respond to practical demos. Plan a live Siemens G120 demo on your remote lab. That 10-minute live segment will convert more than any slide deck.",
+  ],
+  jun: [
+    "You're past the 300-enrollment mark. <strong>Scale is the only priority in June.</strong> Your offline event in Pune is a powerful differentiator — no online-only competitor can do this. Prioritize getting 50 engineers in a room, showing them your real lab hardware, and closing group bookings on the spot. A physical event converts 3–5x better than a webinar.",
+    "B2B is opening up in June. <strong>Three corporate group bookings</strong> would add 30–50 enrollments in one conversation. Your pitch is simple: 'Your engineers work with Siemens equipment. We train them on it, using our actual lab in Pune. Here's the invoice.' Lead with familiarity — you've worked with these companies before.",
+  ],
+  jul: [
+    "<strong>Mid-year checkpoint:</strong> You should be past 490 cumulative enrollments entering July. If you're ahead — accelerate the ads. If behind — increase personal B2B outreach. Either way, July's IIoT webinar is your widest-appeal topic. Senior engineers, plant managers, IT/OT people all want to understand IIoT. Target your LinkedIn ad spend precisely this month.",
+    "July is when your <strong>content flywheel should be generating organic leads</strong>. Three months of consistent posting = algorithm favour, follower growth, and inbound DMs. Monitor which posts got the most engagement and double down on that format. Real project photos and 'before/after automation' content consistently outperform generic posts.",
+  ],
+  aug: [
+    "<strong>220 enrollments this month.</strong> You're 80% of the way there entering August. The corporate L&D push is critical — if you can land 3 companies sending 10 engineers each, that's 30 enrollments in one week. The Kochi offline event targets a segment (Kerala engineers) that trusts Goose deeply. Use that home ground advantage.",
+    "Fresh graduates are your easiest August convert. The 'Career in Automation' webinar is your <strong>highest conversion topic of the year</strong>. Every fresh engineer with a BE/Diploma in electrical or mechatronics is asking the same question: 'What skill gets me a job?' You have the answer and the proof. Make that the centerpiece of your content this month.",
+  ],
+  sep: [
+    "<strong>The final month. 1,000 is within reach.</strong> Everything you've built — the content, the relationships, the referral network, the B2B pipeline — comes home this month. Your job is simple: leave no lead unconverted. Every person in your CRM who ever expressed interest gets a personal call from you this month. This is the sprint.",
+    "September is also when you <strong>plant the seed for FY26.</strong> Every certificate ceremony attendee is a potential FY26 referrer. Every enrolled learner who finishes is your strongest marketing asset. The 'impact report' — '1,000 engineers, 6 months, one platform' — becomes your content for the next year. Document everything as you close.",
+  ],
+};
+
+let briefIdx = {};
+function generateBrief() {
+  const m = currentMonth;
+  const options = BRIEFS[m] || BRIEFS.mar;
+  const idx = (briefIdx[m] || 0) % options.length;
+  briefIdx[m] = idx + 1;
+  const el = document.getElementById('ai-brief-text');
+  el.style.opacity = 0;
+  setTimeout(() => {
+    el.innerHTML = options[idx];
+    el.style.opacity = 1;
+  }, 300);
+  el.style.transition = 'opacity 0.3s';
+}
+
+// ── MONTH SWITCH ──────────────────────────────────────────────────────────────
+function setMonth(month) {
+  currentMonth = month;
+  document.querySelectorAll('.month-tab').forEach((t, i) => {
+    t.classList.toggle('active',
+      ['mar','apr','may','jun','jul','aug','sep'][i] === month);
+  });
+  updateStats(month);
+  updateProgress(month);
+  updateCountdown(month);
+  renderTasks(month);
+  renderWeekly(month);
+  renderEmailTemplates(month);
+  renderTeamMessage(month);
+  renderEnrollmentChart();
+  generateBrief();
+  updateDateDisplay();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+function init() {
+  const now = new Date();
+  const m = now.getMonth();
+  const monthMap = { 2:'mar', 3:'apr', 4:'may', 5:'jun', 6:'jul', 7:'aug', 8:'sep' };
+  const detected = monthMap[m] || 'mar';
+
+  updateDateDisplay();
+  setMonth(detected);
+
+  // Animate progress bar on load
+  setTimeout(() => updateProgress(detected), 600);
+}
+
+init();
+</script>
+</body>
+</html>
